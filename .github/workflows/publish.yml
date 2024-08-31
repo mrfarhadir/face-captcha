@@ -3,7 +3,7 @@ name: Build, Tag, and Version on Merge to Master
 on:
   push:
     branches:
-      - master
+      - main 
 
 jobs:
   build-and-tag:
