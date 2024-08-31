@@ -1,0 +1,57 @@
+name: Build, Tag, and Version on Merge to Master
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Run the build script
+      - name: Build project
+        run: npm run build
+
+      # Step 5: Commit the dist directory
+      - name: Commit dist directory
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add dist
+          git commit -m "chore: add dist directory"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 6: Bump version in package.json and create a tag
+      - name: Bump version and create tag
+        id: bump_version
+        run: |
+          # Choose the type of version bump: patch, minor, major
+          npm version patch -m "chore(release): %s"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 7: Push changes and tags
+      - name: Push changes
+        run: |
+          git push origin master
+          git push origin --tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
