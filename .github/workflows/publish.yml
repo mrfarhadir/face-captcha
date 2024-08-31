@@ -1,12 +1,12 @@
-name: Build, Tag, and Version on Merge to Master
+name: Build, Tag, and Release on Merge to Main
 
 on:
   push:
     branches:
-      - main 
+      - main
 
 jobs:
-  build-and-tag:
+  build-tag-release:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,34 +24,48 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Step 4: Run the build script
+      # Step 4: Run the build script to generate dist directory
       - name: Build project
         run: npm run build
 
-      # Step 5: Commit the dist directory
-      - name: Commit dist directory
-        run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "actions@github.com"
-          git add -f dist
-          git commit -m "chore: add dist directory"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Step 6: Bump version in package.json and create a tag
+      # Step 5: Bump the version in package.json and create a new tag
       - name: Bump version and create tag
         id: bump_version
         run: |
           # Choose the type of version bump: patch, minor, major
-          npm version patch -m "chore(release): %s"
+          NEW_VERSION=$(npm version patch -m "chore(release): %s" | tail -1)
+          echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 7: Push changes and tags
-      - name: Push changes
+      # Step 6: Push changes and tags to the main branch
+      - name: Push changes and tags
         run: |
-          git push origin main 
+          git push origin main
           git push origin --tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 7: Create a GitHub Release with the new tag and attach dist contents
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ env.NEW_VERSION }}
+          release_name: Release ${{ env.NEW_VERSION }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 8: Upload dist directory to the release
+      - name: Upload dist folder to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist
+          asset_name: dist.zip
+          asset_content_type: application/zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
