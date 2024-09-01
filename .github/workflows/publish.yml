@@ -37,28 +37,43 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      # Step 6: Bump the version in package.json and create a new tag
-      - name: Bump version and create tag
+      # Step 6: Temporarily allow dist folder in the Git repository
+      - name: Allow dist folder in Git
+        run: |
+          # Remove dist from .gitignore
+          sed -i '/dist/d' .gitignore
+          # Stage the change to .gitignore
+          git add .gitignore
+          # Stage the dist folder
+          git add dist
+
+      # Step 7: Commit and tag the new version
+      - name: Commit changes and create tag
         id: bump_version
         run: |
-          # Choose the type of version bump: patch, minor, major
+          # Bump the version
           NEW_VERSION=$(npm version patch -m "chore(release): %s")
           NEW_VERSION=${NEW_VERSION#*v}  # Remove 'v' if present
           echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
+          # Commit the changes
+          git commit -m "chore: release ${NEW_VERSION} with dist folder"
+          # Tag the release
+          git tag -a "${NEW_VERSION}" -m "Release ${NEW_VERSION}"
 
-      # Step 7: Debugging step to output the new version
+      # Step 8: Debugging step to output the new version
       - name: Debug NEW_VERSION
         run: echo "The new version is ${{ env.NEW_VERSION }}"
 
-      # Step 8: Push the new tag to the repository
-      - name: Push tag
+      # Step 9: Push changes and the new tag to the repository
+      - name: Push changes and tag
         run: |
-          git push origin --tags
+          git push origin ${{ env.NEW_VERSION }} --follow-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 9: Create a GitHub Release with the new tag and attach dist contents
+      # Step 10: Create a GitHub Release with the new tag
       - name: Create GitHub Release
+        id: create_release
         uses: actions/create-release@v1
         with:
           tag_name: ${{ env.NEW_VERSION }}
@@ -67,4 +82,5 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
