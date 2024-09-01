@@ -1,13 +1,3 @@
-name: Build, Tag, and Release on Merge to Main
-
-on:
-  push:
-    branches:
-      - main
-
-permissions:
-  contents: write
-
 jobs:
   build-tag-release:
     runs-on: ubuntu-latest
@@ -37,30 +27,28 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      # Step 7: Commit and tag the new version
-      - name: Commit changes and create tag
+      # Step 6: Commit any uncommitted changes
+      - name: Commit changes
+        run: |
+          git add .
+          git commit -m "chore: commit changes before version bump" || echo "No changes to commit"
+
+      # Step 7: Bump the version and create a tag
+      - name: Bump version
         id: bump_version
         run: |
-          # Bump the version
           NEW_VERSION=$(npm version patch -m "chore(release): %s")
+          NEW_VERSION=${NEW_VERSION#*v}  # Remove 'v' if present
           echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
-          git commit -am "chore: release ${NEW_VERSION} with dist folder"
-          # Tag the release
-          git tag -a "${NEW_VERSION}" -m "Release ${NEW_VERSION}"
-          git commit -am "chore: release ${NEW_VERSION} with dist folder"
 
-      # Step 8: Debugging step to output the new version
-      - name: Debug NEW_VERSION
-        run: echo "The new version is ${{ env.NEW_VERSION }}"
-
-      # Step 9: Push changes and the new tag to the repository
+      # Step 8: Push the changes and the new tag
       - name: Push changes and tag
         run: |
-          git push origin ${{ env.NEW_VERSION }} --follow-tags
+          git push origin main --follow-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 10: Create a GitHub Release with the new tag
+      # Step 9: Create a GitHub Release with the new tag
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
@@ -71,5 +59,3 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
