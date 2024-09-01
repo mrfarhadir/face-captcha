@@ -48,7 +48,7 @@ jobs:
 
       # Step 7: Create a GitHub Release with the new tag and attach dist contents
       - name: Create GitHub Release
-        uses: actions/create-release@v1
+        uses: actions/create-release@v2
         with:
           tag_name: ${{ env.NEW_VERSION }}
           release_name: Release ${{ env.NEW_VERSION }}
@@ -59,7 +59,7 @@ jobs:
 
       # Step 8: Upload dist directory to the release
       - name: Upload dist folder to release
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v2
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: ./dist
