@@ -31,7 +31,13 @@ jobs:
       - name: Build project
         run: npm run build
 
-      # Step 5: Bump the version in package.json and create a new tag
+      # Step 5: Set up Git user name and email
+      - name: Configure Git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      # Step 6: Bump the version in package.json and create a new tag
       - name: Bump version and create tag
         id: bump_version
         run: |
@@ -40,18 +46,18 @@ jobs:
           NEW_VERSION=${NEW_VERSION#*v}  # Remove 'v' if present
           echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
 
-      # Step 6: Debugging step to output the new version
+      # Step 7: Debugging step to output the new version
       - name: Debug NEW_VERSION
         run: echo "The new version is ${{ env.NEW_VERSION }}"
 
-      # Step 7: Push the new tag to the repository
+      # Step 8: Push the new tag to the repository
       - name: Push tag
         run: |
           git push origin --tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 8: Create a GitHub Release with the new tag and attach dist contents
+      # Step 9: Create a GitHub Release with the new tag and attach dist contents
       - name: Create GitHub Release
         uses: actions/create-release@v1
         with:
@@ -62,7 +68,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 9: Upload dist directory to the release
+      # Step 10: Upload dist directory to the release
       - name: Upload dist folder to release
         uses: actions/upload-release-asset@v1
         with:
