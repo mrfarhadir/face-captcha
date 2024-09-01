@@ -43,7 +43,6 @@ jobs:
         run: |
           # Bump the version
           NEW_VERSION=$(npm version patch -m "chore(release): %s")
-          NEW_VERSION=${NEW_VERSION#*v}  # Remove 'v' if present
           echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
           # Tag the release
           git tag -a "${NEW_VERSION}" -m "Release ${NEW_VERSION}"
