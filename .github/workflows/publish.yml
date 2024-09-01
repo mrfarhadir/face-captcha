@@ -56,7 +56,8 @@ jobs:
           NEW_VERSION=${NEW_VERSION#*v}  # Remove 'v' if present
           echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
           # Commit the changes
-          git commit -m "chore: release ${NEW_VERSION} with dist folder"
+          git add .
+          git commit -am "chore: release ${NEW_VERSION} with dist folder"
           # Tag the release
           git tag -a "${NEW_VERSION}" -m "Release ${NEW_VERSION}"
 
