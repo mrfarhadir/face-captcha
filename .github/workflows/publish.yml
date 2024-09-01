@@ -44,9 +44,10 @@ jobs:
           # Bump the version
           NEW_VERSION=$(npm version patch -m "chore(release): %s")
           echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
-          git commit -m "chore: release ${NEW_VERSION} with dist folder"
+          git commit -am "chore: release ${NEW_VERSION} with dist folder"
           # Tag the release
           git tag -a "${NEW_VERSION}" -m "Release ${NEW_VERSION}"
+          git commit -am "chore: release ${NEW_VERSION} with dist folder"
 
       # Step 8: Debugging step to output the new version
       - name: Debug NEW_VERSION
