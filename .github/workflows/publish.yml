@@ -37,17 +37,6 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      # Step 6: Temporarily allow dist folder in the Git repository
-      - name: Allow dist folder in Git
-        run: |
-          # Remove dist from .gitignore
-          sed -i '/dist/d' .gitignore
-          # Stage the change to .gitignore
-          git add .gitignore
-          # Stage the dist folder
-          git add dist
-          git commit -am "chore: release with dist folder"
-
       # Step 7: Commit and tag the new version
       - name: Commit changes and create tag
         id: bump_version
@@ -56,9 +45,6 @@ jobs:
           NEW_VERSION=$(npm version patch -m "chore(release): %s")
           NEW_VERSION=${NEW_VERSION#*v}  # Remove 'v' if present
           echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
-          # Commit the changes
-          git add .
-          git commit -am "chore: release ${NEW_VERSION} with dist folder"
           # Tag the release
           git tag -a "${NEW_VERSION}" -m "Release ${NEW_VERSION}"
 
