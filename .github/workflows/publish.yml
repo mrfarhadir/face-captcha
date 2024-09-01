@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   build-tag-release:
     runs-on: ubuntu-latest
@@ -35,16 +38,13 @@ jobs:
           # Choose the type of version bump: patch, minor, major
           NEW_VERSION=$(npm version patch -m "chore(release): %s" | tail -1)
           echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 6: Push changes and tags to the main branch
-      - name: Push changes and tags
+      # Step 6: Push the new tag to the repository
+      - name: Push tag
         run: |
-          git push origin main
           git push origin --tags
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Step 7: Create a GitHub Release with the new tag and attach dist contents
       - name: Create GitHub Release
@@ -55,17 +55,16 @@ jobs:
           draft: false
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Step 8: Upload dist directory to the release
       - name: Upload dist folder to release
         uses: actions/upload-release-asset@v1
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: ./dist
           asset_name: dist.zip
           asset_content_type: application/zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 
