@@ -46,6 +46,7 @@ jobs:
           git add .gitignore
           # Stage the dist folder
           git add dist
+          git commit -am "chore: release with dist folder"
 
       # Step 7: Commit and tag the new version
       - name: Commit changes and create tag
