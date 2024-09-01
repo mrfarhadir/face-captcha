@@ -1,3 +1,13 @@
+name: Build, Tag, and Release on Merge to Main
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
 jobs:
   build-tag-release:
     runs-on: ubuntu-latest
