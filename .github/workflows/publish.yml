@@ -36,7 +36,7 @@ jobs:
         id: bump_version
         run: |
           # Choose the type of version bump: patch, minor, major
-          NEW_VERSION=$(npm version patch -m "chore(release): %s" | tail -1)
+          NEW_VERSION=$(npm version patch -m "chore(release): %s")
           echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
 
       # Step 6: Push the new tag to the repository
