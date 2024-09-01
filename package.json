@@ -1,6 +1,6 @@
 {
   "name": "face-captcha",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "a nice tool to used instead of all boring capchas",
   "main": "index.js",
   "scripts": {
