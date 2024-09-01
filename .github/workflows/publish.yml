@@ -44,7 +44,7 @@ jobs:
           git push origin main
           git push origin --tags
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN}}
 
       # Step 7: Create a GitHub Release with the new tag and attach dist contents
       - name: Create GitHub Release
@@ -55,7 +55,7 @@ jobs:
           draft: false
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN}}
 
       # Step 8: Upload dist directory to the release
       - name: Upload dist folder to release
