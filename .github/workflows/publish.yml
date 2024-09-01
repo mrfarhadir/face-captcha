@@ -39,6 +39,9 @@ jobs:
           NEW_VERSION=$(npm version patch | sed 's/v//')
           echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
 
+      - name: Debug NEW_VERSION
+        run: echo "The new version is ${{ env.NEW_VERSION }}"
+
       # Step 6: Push the new tag to the repository
       - name: Push tag
         run: |
@@ -50,8 +53,8 @@ jobs:
       - name: Create GitHub Release
         uses: actions/create-release@v2
         with:
-          tag_name: ${{ env.NEW_VERSION }}
-          release_name: Release ${{ env.NEW_VERSION }}
+          tag_name: ${{ env.GITHUB_ENV}}
+          release_name: Release ${{ env.GITHUB_ENV}}
           draft: false
           prerelease: false
         env:
